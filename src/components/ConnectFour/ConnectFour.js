@@ -5,6 +5,8 @@ import { COLUMNS, PLAYER_COLORS } from "../../constants";
 import useGame from "../../hooks/useGame";
 import Cell from "./Cell";
 import StartForm from "../StartForm/StartForm";
+import CurrentPlayer from "./CurrentPlayer/CurrentPlayer";
+import { darken } from "../../theme/utils";
 
 const Wrapper = styled.div`
   display: flex;
@@ -17,7 +19,7 @@ const GameGrid = styled.div`
   flex-direction: column;
   gap: 10px;
   padding: 20px;
-  background-color: #00187a;
+  background-color: #dee2e6;
   opacity: ${(props) => (props.gameEnded ? 0.7 : 1.0)};
   justify-content: center;
   align-items: center;
@@ -43,6 +45,23 @@ const GameRow = styled.div`
   gap: 10px;
 `;
 
+const RestartButton = styled.button`
+  all: unset;
+  background-color: ${(props) => (props.disabled ? "#CCCCCC" : "#0087FF")};
+  &:hover,
+  &:focus {
+    background-color: ${(props) =>
+      props.disabled ? "#CCCCCC" : darken("#0087FF")};
+  }
+  color: ${(props) => (props.disabled ? "#555555" : "white")};
+  border-radius: 15px;
+  font-size: 24px;
+  padding: 15px;
+  text-align: center;
+  cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  transition: 0.5s;
+`;
+
 const ConnectFour = () => {
   const [initialGameSettings, setInitialGameSettings] = useState({
     rows: 7,
@@ -53,7 +72,14 @@ const ConnectFour = () => {
   });
   const gameStarted = initialGameSettings.started;
   const game = useGame(initialGameSettings, setInitialGameSettings);
-  const { board, currentPlayer, dropIndicator, gameEnded, winner } = game.state;
+  const {
+    board,
+    currentPlayer,
+    dropIndicator,
+    gameEnded,
+    winner,
+    winningMove,
+  } = game.state;
   const PLAYERS = PLAYER_COLORS.slice(0, initialGameSettings.numberPlayers);
   const nextPlayer =
     PLAYERS.find((player) => player.id === currentPlayer + 1) || PLAYERS[0];
@@ -83,7 +109,7 @@ const ConnectFour = () => {
       }
     }
     if (lastMove) {
-      game.handleDrop(null); //remove droppable indicator before dropping piece.
+      game.handleDrop({ col: lastMove.col, row: lastMove.row - 1 }); //remove droppable indicator before dropping piece.
       game.handleEndTurn(newBoard, lastMove, nextPlayer.id);
     }
   };
@@ -107,29 +133,35 @@ const ConnectFour = () => {
                 } is the winner!`
               : "Draw!"}
           </WinnerText>
-          <button onClick={() => game.handleRestartGame()}>Restart</button>
+          <RestartButton onClick={() => game.handleRestartGame()}>
+            Restart
+          </RestartButton>
         </EndWrapper>
       ) : null}
       {gameStarted ? (
-        <GameGrid gameEnded={gameEnded} columns={initialGameSettings.columns}>
-          {board.map((row, rowIndex) => (
-            <GameRow key={rowIndex}>
-              {row.map((_, colIndex) => (
-                <Cell
-                  currentPlayer={currentPlayer}
-                  determineDropLocation={determineDropLocation}
-                  disabled={gameEnded}
-                  dropIndicator={dropIndicator}
-                  handleDropLocation={handleDropLocation}
-                  key={`${rowIndex}:${colIndex}`}
-                  location={{ col: colIndex, row: rowIndex }}
-                  token={board[rowIndex][colIndex]}
-                  players={PLAYERS}
-                />
-              ))}
-            </GameRow>
-          ))}
-        </GameGrid>
+        <>
+          {gameEnded ? null : <CurrentPlayer currentPlayer={currentPlayer} />}
+          <GameGrid gameEnded={gameEnded} columns={initialGameSettings.columns}>
+            {board.map((row, rowIndex) => (
+              <GameRow key={rowIndex}>
+                {row.map((_, colIndex) => (
+                  <Cell
+                    currentPlayer={currentPlayer}
+                    determineDropLocation={determineDropLocation}
+                    disabled={gameEnded}
+                    dropIndicator={dropIndicator}
+                    handleDropLocation={handleDropLocation}
+                    key={`${rowIndex}:${colIndex}`}
+                    location={{ col: colIndex, row: rowIndex }}
+                    token={board[rowIndex][colIndex]}
+                    players={PLAYERS}
+                    winningMove={winningMove}
+                  />
+                ))}
+              </GameRow>
+            ))}
+          </GameGrid>
+        </>
       ) : null}
     </Wrapper>
   );

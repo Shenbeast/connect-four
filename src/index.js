@@ -9,10 +9,16 @@ const GlobalStyle = createGlobalStyle`
     font-family:  "Open Sans", Arial, Helvetica, sans-serif;
     color: black;
     padding: 40px;
+    @media (max-width: 640px) {
+      padding: 20px;
+    }
     font-weight: 400;
   }
   h1 {
-    font-size: 42px
+    font-size: 42px;
+    @media (max-width: 640px) {
+      font-size: 28px;
+    }
   }
   button {
     cursor: pointer;

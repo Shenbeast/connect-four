@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import useInput from "../../hooks/useInput";
+import { darken } from "../../theme/utils";
 
 const Wrapper = styled.div`
   border-radius: 15px;
@@ -19,18 +20,23 @@ const StyledInput = styled.input`
   background-color: "#F4F4F4";
   &:focus {
     background-color: "#E8E8E8";
+    border: 1px solid blue;
   }
   padding: 10px;
   margin-bottom: 10px;
-  width: 350px;
   font-size: 24px;
   border: 1px solid lightgray;
+  transition: 0.5s;
 `;
 
 const SubmitButton = styled.button`
   all: unset;
-  width: 350px;
   background-color: ${(props) => (props.disabled ? "#CCCCCC" : "#0087FF")};
+  &:hover,
+  &:focus {
+    background-color: ${(props) =>
+      props.disabled ? "#CCCCCC" : darken("#0087FF")};
+  }
   color: ${(props) => (props.disabled ? "#555555" : "white")};
   border-radius: 15px;
   font-size: 24px;
@@ -39,6 +45,11 @@ const SubmitButton = styled.button`
   margin-top: 10px;
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   transition: 0.5s;
+`;
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
 `;
 
 const StartForm = ({ initialGameSettings, setInitialGameSettings, reset }) => {
@@ -65,7 +76,7 @@ const StartForm = ({ initialGameSettings, setInitialGameSettings, reset }) => {
 
   return (
     <Wrapper>
-      <form onSubmit={(e) => handleSubmit(e)}>
+      <StyledForm onSubmit={(e) => handleSubmit(e)}>
         <StyledLabel>
           <span>Number rows (max 12)</span>
           <StyledInput
@@ -113,7 +124,7 @@ const StartForm = ({ initialGameSettings, setInitialGameSettings, reset }) => {
         <SubmitButton disabled={buttonDisabled} id="submit" type="submit">
           Start Game
         </SubmitButton>
-      </form>
+      </StyledForm>
     </Wrapper>
   );
 };

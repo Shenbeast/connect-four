@@ -19,6 +19,7 @@ const useGame = (initialGameSettings, setInitialGameSettings) => {
     dropIndicator: null,
     gameEnded: false,
     winner: null,
+    winningMove: null,
   };
 
   const checkWinner = (board, currentPlayer, lastMove) => {
@@ -107,7 +108,9 @@ const useGame = (initialGameSettings, setInitialGameSettings) => {
           checkWinner(action.board, newState.currentPlayer, action.lastMove) ===
           true
         ) {
+          newState.winningMove = action.lastMove;
           newState.winner = newState.currentPlayer;
+          newState.dropIndicator = null;
           newState.gameEnded = true;
         } else if (
           checkWinner(action.board, newState.currentPlayer, action.lastMove) ===
